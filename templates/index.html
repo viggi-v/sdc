@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SDC Project</title>
+  <script type="text/javascript" src="../static/dist/vis.js"></script>
+    <script src="../static/jq.js"></script>
+  <link href="../static/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    #mynetwork {
+      width: 600px;
+      height: 400px;
+      border: 1px solid lightgray;
+    }
+  </style>
+
+
+</head>
+    <body>
+        <div class="form_holder">
+            <form>
+                <textarea name="cubes" id="cubes" cols="30" rows="10" placeholder="Enter the cubes as comma seperated values"></textarea>
+            </form>
+            <button onclick="renderRobdd()">Okay</button>
+        </div>
+        <div id="mynetwork"></div>
+        <script type="text/javascript">
+          dataObj = {};
+          function renderRobdd(){
+              $.ajax({
+                  url: '/api/test',
+                  data: $('form').serialize(),
+                  type: "POST",
+                  success: function (response) {
+                      dataObj = JSON.parse(response);
+                      console.log(dataObj);
+                      var container = document.getElementById('mynetwork');
+                      var data = {
+                          nodes: dataObj.nodes,
+                          edges: dataObj.edges
+                      };
+                      var options = {
+                          groups:{
+                              diamonds: {
+                                    color: {background:'rgb(255, 102, 122)',border:'white'},
+                                    shape: 'diamond'
+                                }
+                          },
+                          nodes: {
+                                shape: 'dot',
+                                size: 20,
+                                font: {
+                                    size: 15,
+                                    color: 'black'
+                                },
+                                borderWidth: 2
+                            },
+                            edges: {
+                                width: 2
+                            }
+                      };
+                      var network = new vis.Network(container, data, options);
+                  },
+                  error:function(response){
+                      alert("connectivity issue");
+                  }
+              });
+          }
+        </script>
+    </body>
+</html>
