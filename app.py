@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, request
-from script.robdd import ROBDD
+import script.robdd as robdd
+import math
 import json
+import sys
 
 app = Flask(__name__,static_url_path="/static")
 
@@ -14,7 +16,6 @@ def index():
 
 @app.route("/api/test", methods = ['POST'])
 def greet():
-    raw_cubes = []
 
     if request.form['cubes'] is not None:
         raw_cubes = request.form['cubes'].split(',')
@@ -24,10 +25,13 @@ def greet():
     for cube in raw_cubes:
         if len(cube) != stlen:
             return 'Please provide valid cubes'
-
-    robdd = ROBDD(raw_cubes)
-    robdd.traverse()
-    return robdd.makeJSON()
+    lim = max([len(word) for word in raw_cubes]) / 2
+    size = int(math.pow(2, lim))
+    array = robdd.makeArray(raw_cubes, size)
+    newArr = robdd.traverse(array, size - 1)
+    iteStr = robdd.ite(newArr[0])
+    returnObj = '{"robdd":'+ robdd.makeJSON(newArr[0])+', "ite":"'+iteStr+'"}'
+    return returnObj
 
 
 @app.route("/api/demo",methods = ['POST'])
